@@ -100,7 +100,7 @@ export default function Login() {
           <div className="rounded-md shadow-sm space-y-5">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                Nom d'utilisateur
+                Nom d utilisateur
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -192,9 +192,9 @@ export default function Login() {
         </form>
 
         <div className="text-center text-sm text-gray-600 mt-6">
-          <p>Vous n'avez pas de compte?{' '}
+          <p>Vous n avez pas de compte?{' '}
             <Link href="/register" className="font-medium text-orange-600 hover:text-orange-500">
-              S'inscrire maintenant
+              S inscrire maintenant
             </Link>
           </p>
         </div>

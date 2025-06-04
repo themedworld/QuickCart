@@ -196,7 +196,7 @@ export default function Register() {
 
               <div>
                 <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                  Nom d'utilisateur
+                  Nom dutilisateur
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -249,7 +249,7 @@ export default function Register() {
                   className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
                 />
                 <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-                  J'accepte les <a href="#" className="text-orange-600 hover:text-orange-500">conditions d'utilisation</a>
+                  J accepte les <a href="#" className="text-orange-600 hover:text-orange-500">conditions d utilisation</a>
                 </label>
               </div>
 
@@ -283,7 +283,7 @@ export default function Register() {
           <div className="mt-6 text-center text-sm text-gray-600">
             <p>En créant un compte, vous acceptez nos{' '}
               <a href="#" className="font-medium text-orange-600 hover:text-orange-500">
-                Conditions d'utilisation
+                Conditions d utilisation
               </a>{' '}
               et notre{' '}
               <a href="#" className="font-medium text-orange-600 hover:text-orange-500">
