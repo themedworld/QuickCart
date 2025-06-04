@@ -108,7 +108,7 @@ const getCategoryName = (categories) => {
                           />
                         ) : (
                           <div className="w-16 h-16 flex items-center justify-center bg-gray-200">
-                            <span className="text-xs text-gray-500">Pas d'image</span>
+                            <span className="text-xs text-gray-500">Pas dimage</span>
                           </div>
                         )}
                       </div>
