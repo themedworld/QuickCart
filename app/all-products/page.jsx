@@ -9,7 +9,7 @@ import CartSummary from "@/components/CartSummary";
 import ProtectedRoute from "@/components/ProtectedPage";
 
 const AllProducts = () => {
-    const authData = useSelector(state => state.auth);
+   
 
     return (
         <ProtectedRoute allowedRoles={['customer']}>
