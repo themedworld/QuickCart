@@ -13,14 +13,14 @@ const AllProducts = () => {
 
     return (
         <ProtectedRoute allowedRoles={['customer']}>
-            <AppContextProvider authData={authData}>
+         
                 <NavbarClient />
                 <div className="p-6">
                     <h1 className="text-2xl font-bold mb-4">All Products</h1>
                     <ProductsList />
                 </div>
                 <CartSummary />
-            </AppContextProvider>
+          
         </ProtectedRoute>
     );
 };
@@ -103,7 +103,7 @@ const ProductsList = () => {
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {filteredProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} />
+                       <ProductCard key={product.id} product={product} />
                     ))}
                 </div>
             )}
