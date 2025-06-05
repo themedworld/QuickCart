@@ -3,32 +3,24 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import Image from "next/image";
-import { FiShoppingCart, FiArrowLeft, FiChevronRight } from "react-icons/fi";
-
+import { FiShoppingCart, FiArrowLeft, FiChevronRight, FiPlus, FiMinus } from "react-icons/fi";
 import { toast } from "react-toastify";
 import Loading from "@/components/Loading";
-import AllProducts from "@/app/all-products/page";
 import { useAppContext } from '@/context/AppContext';
-
 
 const ProductforClient = () => {
   const { id } = useParams();
-
+  const router = useRouter();
   const dispatch = useDispatch();
   const { token, isAuthenticated } = useSelector((state) => state.auth);
-  const cartItems = useSelector((state) => state.cart.items);
+  const { currency, addToCart } = useAppContext();
 
   const [product, setProduct] = useState(null);
   const [mainImage, setMainImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedVariation, setSelectedVariation] = useState(null);
-    const { currency, router, addToCart } = useAppContext()
 
-    const handleAddToCart = (e) => {
-        e.stopPropagation();
-        addToCart(product);
-    }
   const fetchProductById = async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wc/v3/products/${id}`, {
@@ -57,19 +49,27 @@ const ProductforClient = () => {
     }
   }, [id, token]);
 
- 
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    const productToAdd = {
+      ...product,
+      quantity: quantity // Ajoute la quantité sélectionnée
+    };
+    addToCart(productToAdd);
+    toast.success(`${quantity} ${product.name} ajouté(s) au panier`);
+  };
 
   const handleBuyNow = () => {
-    handleAddToCart();
+    handleAddToCart({ preventDefault: () => {} });
     router.push("/cart");
   };
 
   if (!isAuthenticated) return (
     <div className="text-center py-20">
-      <p>Veuillez vous connecter pour voir ce produit</p>
+      <p className="text-gray-700 mb-4">Veuillez vous connecter pour voir ce produit</p>
       <button 
         onClick={() => router.push("/login")}
-        className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition shadow-md"
       >
         Se connecter
       </button>
@@ -83,7 +83,7 @@ const ProductforClient = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <button 
         onClick={() => router.back()}
-        className="flex items-center text-gray-600 hover:text-gray-900 mb-6 transition"
+        className="flex items-center text-orange-600 hover:text-orange-800 mb-6 transition"
       >
         <FiArrowLeft className="mr-2" /> Retour
       </button>
@@ -91,12 +91,12 @@ const ProductforClient = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
         {/* Gallery */}
         <div className="space-y-4">
-          <div className="bg-gray-50 rounded-xl overflow-hidden aspect-square flex items-center justify-center">
+          <div className="bg-gray-50 rounded-xl overflow-hidden aspect-square flex items-center justify-center shadow-sm border border-gray-200">
             {mainImage ? (
               <img
                 src={mainImage}
                 alt={product.name}
-                className="w-full h-full object-contain p-4"
+                className="w-full h-full object-contain p-4 transition-transform duration-300 hover:scale-105"
               />
             ) : (
               <div className="text-gray-400">Aucune image</div>
@@ -108,7 +108,11 @@ const ProductforClient = () => {
               <button
                 key={index}
                 onClick={() => setMainImage(image.src)}
-                className={`aspect-square bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center border-2 ${mainImage === image.src ? 'border-blue-500' : 'border-transparent'}`}
+                className={`aspect-square bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center border-2 transition-all ${
+                  mainImage === image.src 
+                    ? 'border-orange-500 scale-105' 
+                    : 'border-transparent hover:border-gray-300'
+                }`}
               >
                 <img 
                   src={image.src} 
@@ -129,7 +133,7 @@ const ProductforClient = () => {
               {[1, 2, 3, 4, 5].map((star) => (
                 <svg
                   key={star}
-                  className="w-5 h-5 text-yellow-400"
+                  className={`w-5 h-5 ${star <= Math.floor(product.average_rating || 0) ? 'text-orange-400' : 'text-gray-300'}`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -137,14 +141,19 @@ const ProductforClient = () => {
                 </svg>
               ))}
             </div>
-            <span className="text-gray-500">(Aucun avis)</span>
+            <span className="text-gray-500">({product.average_rating || 0} avis)</span>
           </div>
 
           <div className="text-3xl font-bold text-gray-900">
             {product.price_html ? (
               <span dangerouslySetInnerHTML={{ __html: product.price_html }} />
             ) : (
-              `${product.price} €`
+              `${currency}${product.price}`
+            )}
+            {product.sale_price && (
+              <span className="text-lg text-gray-500 line-through ml-2">
+                {currency}${product.regular_price}
+              </span>
             )}
           </div>
 
@@ -153,18 +162,14 @@ const ProductforClient = () => {
             dangerouslySetInnerHTML={{ __html: product.description }} 
           />
 
-          {product.stock_quantity > 0 ? (
-            <div className="text-green-600 font-medium">En stock ({product.stock_quantity} disponibles)</div>
-          ) : (
-            <div className="text-red-600 font-medium">En rupture de stock</div>
-          )}
+
 
           {product.variations && product.variations.length > 0 && (
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">Variations</label>
               <select
                 onChange={(e) => setSelectedVariation(parseInt(e.target.value))}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
               >
                 {product.variations.map((variation) => (
                   <option key={variation.id} value={variation.id}>
@@ -175,66 +180,43 @@ const ProductforClient = () => {
             </div>
           )}
 
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center border border-gray-300 rounded-md">
-              <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="px-3 py-2 text-gray-600 hover:bg-gray-100"
-                disabled={quantity <= 1}
-              >
-                -
-              </button>
-              <span className="px-4 py-2">{quantity}</span>
-              <button
-                onClick={() => setQuantity(quantity + 1)}
-                className="px-3 py-2 text-gray-600 hover:bg-gray-100"
-                disabled={product.stock_quantity && quantity >= product.stock_quantity}
-              >
-                +
-              </button>
-            </div>
-          </div>
-
+         
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <button
               onClick={handleAddToCart}
               disabled={product.stock_quantity === 0}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition transform hover:scale-[1.02] active:scale-95"
             >
               <FiShoppingCart /> Ajouter au panier
             </button>
             <button
               onClick={handleBuyNow}
               disabled={product.stock_quantity === 0}
-              className="flex-1 px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="flex-1 px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition transform hover:scale-[1.02] active:scale-95"
             >
               Acheter maintenant <FiChevronRight className="inline ml-1" />
             </button>
           </div>
 
           <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-sm font-medium text-gray-900">Détails</h3>
-            <div className="mt-4 space-y-2">
-              <div className="flex">
-                <span className="text-gray-500 w-32">Catégorie</span>
-                <span className="text-gray-900">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Détails du produit</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-500 mb-1">Catégorie</h4>
+                <p className="text-gray-900">
                   {product.categories?.map(cat => cat.name).join(", ") || "Non spécifié"}
-                </span>
+                </p>
               </div>
-              <div className="flex">
-                <span className="text-gray-500 w-32">SKU</span>
-                <span className="text-gray-900">{product.sku || "Non spécifié"}</span>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-500 mb-1">Référence</h4>
+                <p className="text-gray-900">{product.sku || "Non spécifié"}</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-    
     </div>
-   
-     
   );
-
 };
 
 export default ProductforClient;
