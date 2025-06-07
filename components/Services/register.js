@@ -15,8 +15,8 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL
     
     // Pour WooCommerce, on utilise plutôt 'customer' ou 'seller' comme rôle
     const woocommerceRole = role === 'vendor' ? 'seller' : 'customer';
-const key=process.env.woo_commerce_client_key;
-const secret=process.env.woo_commerce_client_secret;
+const key=process.env.NEXT_PUBLIC_WC_CONSUMER_KEY;
+const secret=process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET;
     // 1. D'abord, créer l'utilisateur via l'API WordPress
     const wpResponse = await fetch(wpApiUrl, {
       method: 'POST',

@@ -1,7 +1,7 @@
 // app/api/products/route.js
 export async function GET(req) {
-  const key = process.env.woo_commerce_client_key;
-  const secret = process.env.woo_commerce_client_secret;
+  const key = process.env.NEXT_PUBLIC_WC_CONSUMER_KEY;
+  const secret = process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET;
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   
   const basicAuth = Buffer.from(`${key}:${secret}`).toString('base64');

@@ -32,29 +32,27 @@ const ProductsList = () => {
     const [categories, setCategories] = useState([]);
 
     // Extract unique categories from products
-     useEffect(() => {
-        if (products?.length) {
-            // Filter out undefined/null categories and get unique values
-            const uniqueCategories = ['all', ...new Set(
-                products
-                    .map(product => product.category)
-                    .filter(category => category != null)
-            )];
-            setCategories(uniqueCategories);
-        }
-    }, [products]);
+ useEffect(() => {
+    if (products?.length) {
+        const uniqueCategories = ['all', ...new Set(
+            products
+                .flatMap(product => product.categories?.map(c => c.name) || [])
+        )];
+        setCategories(uniqueCategories);
+    }
+}, [products]);
 
-    const filteredProducts = products?.filter(product => {
-        // Filter by category
-        const categoryMatch = selectedCategory === 'all' || product.category === selectedCategory;
-        
-        // Filter by search term (case insensitive)
-        const searchMatch = 
-            product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.description.toLowerCase().includes(searchTerm.toLowerCase());
-        
-        return categoryMatch && searchMatch;
-    });
+
+  const filteredProducts = products?.filter(product => {
+    const categoryNames = product.categories?.map(c => c.name) || [];
+    const categoryMatch = selectedCategory === 'all' || categoryNames.includes(selectedCategory);
+
+    const searchMatch = 
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return categoryMatch && searchMatch;
+});
 
     if (!products?.length) return <p>No products found.</p>;
 

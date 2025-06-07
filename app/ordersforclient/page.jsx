@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import ProtectedRoute from "@/components/ProtectedPage";
 import { FiEdit, FiTrash2, FiClock, FiCheckCircle, FiTruck, FiDollarSign } from 'react-icons/fi';
 import Loading from '@/components/Loading';
-
+  import { toast } from 'react-toastify'; // Ajoutez cette importation
 const MyOrders = () => {
   const router = useRouter();
   const token = useSelector(state => state.auth.token);
@@ -17,12 +17,16 @@ const MyOrders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wc/v3/orders?customer=2&consumer_key=${process.env.woo_commerce_client_key}&consumer_secret=${process.env.woo_commerce_client_secret}`, {
+        const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wc/v3/orders`);
+        url.searchParams.append('customer', user?.id || 0);
+        
+        const res = await fetch(url.toString(), {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
+        
         if (!res.ok) throw new Error('Impossible de charger les commandes');
         const data = await res.json();
         setOrders(data);
@@ -36,22 +40,41 @@ const MyOrders = () => {
     if (user?.id && token) fetchOrders();
   }, [token, user]);
 
-  const handleDelete = async (orderId) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette commande ?')) return;
 
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wc/v3/orders/${orderId}`, {
+
+const handleDelete = async (orderId) => {
+  if (!confirm('Êtes-vous sûr de vouloir supprimer cette commande ?')) return;
+
+  try {
+    // Vérifiez que les clés API sont bien définies
+    if (!process.env.NEXT_PUBLIC_WC_CONSUMER_KEY || !process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET) {
+      throw new Error('Configuration API manquante');
+    }
+
+    // Méthode recommandée : Authentification Basic
+    const authString = `${process.env.NEXT_PUBLIC_WC_CONSUMER_KEY}:${process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET}`;
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/wp-json/wc/v3/orders/${orderId}?force=true`,
+      {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Basic ${Buffer.from(authString).toString('base64')}`,
         },
-      });
-      if (!res.ok) throw new Error('Erreur lors de la suppression');
-      setOrders(orders.filter(order => order.id !== orderId));
-    } catch (err) {
-      alert(err.message);
+      }
+    );
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Erreur lors de la suppression');
     }
-  };
+
+    setOrders(orders.filter(order => order.id !== orderId));
+    toast.success('Commande supprimée avec succès');
+  } catch (err) {
+    console.error('Delete error:', err);
+    toast.error(err.message || 'Une erreur est survenue lors de la suppression');
+  }
+};
 
   const getStatusBadge = (status) => {
     switch(status) {
@@ -89,7 +112,7 @@ const MyOrders = () => {
         {orders.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <h3 className="text-lg font-medium text-gray-900">Aucune commande trouvée</h3>
-            <p className="mt-2 text-gray-600">Vous n avez pas encore passé de commande.</p>
+            <p className="mt-2 text-gray-600">Vous n'avez pas encore passé de commande.</p>
             <button
               onClick={() => router.push('/products')}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"

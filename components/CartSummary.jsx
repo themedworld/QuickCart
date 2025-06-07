@@ -24,6 +24,14 @@ const CartSummary = () => {
             removeFromCart(productId);
             return;
         }
+        
+        // Vérifier si la nouvelle quantité dépasse le stock disponible
+        const product = items.find(item => item.product.id === productId)?.product;
+        if (product?.stock_quantity && newQuantity > product.stock_quantity) {
+            alert(`Désolé, nous n'avons que ${product.stock_quantity} unité(s) disponible(s) pour ce produit.`);
+            return;
+        }
+        
         updateCartQuantity(productId, newQuantity);
     };
 
@@ -114,6 +122,11 @@ const CartSummary = () => {
                                                                 +
                                                             </button>
                                                         </div>
+                                                        {product.stock_quantity && (
+                                                            <span className="text-xs text-gray-500">
+                                                                Stock: {product.stock_quantity}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                     <span className="font-semibold text-orange-600">
                                                         {currency}{(price * quantity).toFixed(2)}

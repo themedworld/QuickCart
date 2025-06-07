@@ -6,8 +6,8 @@ export async function POST(req) {
     const { email, first_name, last_name, username, password } = body;
 
     const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
-    const secret = process.env.woo_commerce_client_secret;
-    const key = process.env.woo_commerce_client_key;
+    const secret = process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET;
+    const key = process.env.NEXT_PUBLIC_WC_CONSUMER_KEY;
 
     const response = await fetch(`${apiBaseUrl}/wp-json/wc/v3/customers`, {
       method: 'POST',

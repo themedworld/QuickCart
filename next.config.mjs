@@ -13,7 +13,7 @@ const nextConfig = {
                 pathname: '**',
             },
         ],
-          domains: ['earthyhelp.s2-tastewp.com'],
+          domains: ['geniejunior.com'],
     },
 };
 

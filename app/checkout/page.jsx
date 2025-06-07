@@ -7,7 +7,7 @@ import ProtectedRoute from "@/components/ProtectedPage";
 
 const ConfirmOrderPage = () => {
   const router = useRouter();
-  const { cartItems, getCartAmount, currency } = useAppContext();
+  const { cartItems, getCartAmount, currency, clearCart } = useAppContext();
   const user = useSelector(state => state.auth.user);
   const token = useSelector(state => state.auth.token);
 
@@ -17,6 +17,45 @@ const ConfirmOrderPage = () => {
   const [error, setError] = useState('');
   
   const items = Object.values(cartItems || {});
+
+  const updateProductStock = async (productId, quantity) => {
+    try {
+      // Récupérer les détails actuels du produit avec l'authentification WooCommerce
+      const productRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/wp-json/wc/v3/products/${productId}?consumer_key=${process.env.NEXT_PUBLIC_WC_CONSUMER_KEY}&consumer_secret=${process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET}`
+      );
+
+      if (!productRes.ok) {
+        throw new Error("Erreur lors de la récupération du produit");
+      }
+
+      const product = await productRes.json();
+      const currentStock = product.stock_quantity;
+      const newStock = currentStock - quantity;
+
+      // Mettre à jour le stock du produit avec l'authentification WooCommerce
+      const updateRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/wp-json/wc/v3/products/${productId}?consumer_key=${process.env.NEXT_PUBLIC_WC_CONSUMER_KEY}&consumer_secret=${process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            stock_quantity: newStock
+          }),
+        }
+      );
+
+      if (!updateRes.ok) {
+        const errorData = await updateRes.json();
+        throw new Error(errorData.message || "Erreur lors de la mise à jour du stock");
+      }
+    } catch (err) {
+      console.error("Erreur lors de la mise à jour du stock:", err);
+      throw err;
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,6 +87,7 @@ const ConfirmOrderPage = () => {
         customer_id: user?.id || undefined,
       };
 
+      // 1. Créer la commande avec le JWT token (comme avant)
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wc/v3/orders`, {
         method: 'POST',
         headers: {
@@ -63,10 +103,19 @@ const ConfirmOrderPage = () => {
       }
 
       const result = await res.json();
+
+      // 2. Mettre à jour le stock pour chaque produit avec les clés WC
+      const updateStockPromises = items.map(item => 
+        updateProductStock(item.product.id, item.quantity)
+      );
+      
+      await Promise.all(updateStockPromises);
+
       alert("Commande passée avec succès !");
       router.push(`ordersforclient`);
+      clearCart();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Une erreur est survenue lors de la commande");
     } finally {
       setLoading(false);
     }
