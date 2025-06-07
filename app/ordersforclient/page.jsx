@@ -112,7 +112,7 @@ const handleDelete = async (orderId) => {
         {orders.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <h3 className="text-lg font-medium text-gray-900">Aucune commande trouvée</h3>
-            <p className="mt-2 text-gray-600">Vous n'avez pas encore passé de commande.</p>
+            <p className="mt-2 text-gray-600">Vous navez pas encore passé de commande.</p>
             <button
               onClick={() => router.push('/products')}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
