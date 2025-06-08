@@ -7,7 +7,7 @@ import AuthInitializer from "@/components/AuthInitializer";
 const outfit = Outfit({ subsets: ['latin'], weight: ["300", "400", "500"] });
 import { AppContextProvider } from "@/context/AppContext";
 export const metadata = {
-  title: "QuickCart - GreatStack",
+  title: "Geniejunior - GreatStack",
   description: "E-Commerce with Next.js",
 };
 
