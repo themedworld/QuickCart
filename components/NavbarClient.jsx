@@ -94,7 +94,7 @@ const NavbarClient = () => {
         <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg z-50 py-4 px-6">
           <div className="flex flex-col space-y-4">
             <Link 
-              href="/" 
+              href="/client" 
               className="hover:text-gray-900 transition py-2 border-b"
               onClick={() => setIsMenuOpen(false)}
             >
