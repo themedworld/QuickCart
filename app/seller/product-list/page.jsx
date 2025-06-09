@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Loading from "@/components/Loading";
 import ProtectedRoute from "@/components/ProtectedPage";
 import { FiEye, FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
+import { FiBox } from 'react-icons/fi';
 
 const ProductList = () => {
   const router = useRouter();
