@@ -182,6 +182,7 @@ const EditProduct = () => {
 
   return (
     <ProtectedRoute allowedRoles={['shop_manager']}>
+       <div className="min-h-screen bg-gray-50 pb-20 md:pb-0"> 
       <div className="flex-1 min-h-screen flex flex-col justify-between bg-gray-50">
         <form onSubmit={handleSubmit} className="md:p-10 p-4 space-y-5 max-w-lg mx-auto bg-white rounded-lg shadow-md mt-10 mb-10">
           <h1 className="text-2xl font-bold text-gray-800">Modifier le produit</h1>
@@ -404,7 +405,7 @@ const EditProduct = () => {
             </button>
           </div>
         </form>
-      </div>
+      </div></div>
     </ProtectedRoute>
   );
 };
