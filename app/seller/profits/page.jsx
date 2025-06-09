@@ -299,7 +299,7 @@ const StatsPage = () => {
       {/* Cartes indicateurs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg shadow p-4">
-          <h3 className="text-sm md:text-base font-medium text-gray-500">Chiffre d'Affaires</h3>
+          <h3 className="text-sm md:text-base font-medium text-gray-500">Chiffre d Affaires</h3>
           <p className="text-xl md:text-2xl font-bold mt-1">{totalProfit.toLocaleString()} €</p>
           <div className={`mt-1 flex items-center text-xs md:text-sm ${growth >= 0 ? 'text-green-500' : 'text-red-500'}`}>
             {growth >= 0 ? (
@@ -340,7 +340,7 @@ const StatsPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Graphique principal */}
         <div className="bg-white rounded-lg shadow p-4">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Évolution du Chiffre d'Affaires</h2>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Évolution du Chiffre d Affaires</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={profitData}>

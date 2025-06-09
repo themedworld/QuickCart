@@ -161,7 +161,7 @@ const ProductList = () => {
                                   />
                                 ) : (
                                   <div className="h-full w-full flex items-center justify-center bg-gray-200">
-                                    <span className="text-xs text-gray-500">Pas d'image</span>
+                                    <span className="text-xs text-gray-500">Pas d image</span>
                                   </div>
                                 )}
                               </div>
@@ -241,7 +241,7 @@ const ProductList = () => {
                             />
                           ) : (
                             <div className="h-full w-full flex items-center justify-center bg-gray-200">
-                              <span className="text-xs text-gray-500">Pas d'image</span>
+                              <span className="text-xs text-gray-500">Pas d image</span>
                             </div>
                           )}
                         </div>
